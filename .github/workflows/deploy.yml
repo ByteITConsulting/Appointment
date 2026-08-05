@@ -29,6 +29,8 @@ jobs:
         run: npm ci
 
       - name: Build and Export Site
+        env:
+          NEXT_PUBLIC_GA_ID: ${{ secrets.GOOGLE_ANALYTICS_ID }}
         run: |
           if [ -f package-lock.json ]; then npm run build;
           elif [ -f yarn.lock ]; then yarn build;

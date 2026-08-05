@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Appointment, Folga } from '@/lib/types';
 import { downloadCSV } from '@/lib/export';
 import { colors } from '@/styles/design-tokens';
+import { trackEventSafe } from '@/lib/analytics-tracking';
 import { Download, ChevronDown } from 'lucide-react';
 
 export interface ExportButtonProps {
@@ -34,6 +35,10 @@ export function ExportButton({ appointments }: ExportButtonProps) {
 
     setLastExport(now);
     downloadCSV(appointments);
+    trackEventSafe('export_appointment', {
+      count: appointments.length,
+      timestamp: now,
+    });
     setIsOpen(false);
   };
 

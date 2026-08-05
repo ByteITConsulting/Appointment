@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { Appointment, Folga } from '@/lib/types';
 import { importFromCSV, CSVImportValidationError, ImportError } from '@/lib/import';
 import { colors } from '@/styles/design-tokens';
+import { trackEventSafe } from '@/lib/analytics-tracking';
 import { Upload, X, AlertCircle } from 'lucide-react';
 import { t } from '@/utils/i18nClient';
 
@@ -104,9 +105,17 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
       if (result.type === 'appointment') {
         onImportAppointments(result.data as Appointment[]);
         setSuccessMessage(t('import.successAppointment', { count: result.count }));
+        trackEventSafe('import_appointment', {
+          count: result.count,
+          fileSize: file.size,
+        });
       } else {
         onImportFolgas(result.data as Folga[]);
         setSuccessMessage(t('import.successFolga', { count: result.count }));
+        trackEventSafe('import_folga', {
+          count: result.count,
+          fileSize: file.size,
+        });
       }
 
       // Show success for 3 seconds

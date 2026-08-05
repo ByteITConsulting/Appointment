@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Appointment } from '@/lib/types';
 import { colors } from '@/styles/design-tokens';
+import { trackEventSafe } from '@/lib/analytics-tracking';
 import { X } from 'lucide-react';
 
 export interface AppointmentModalProps {
@@ -37,6 +38,11 @@ export function AppointmentModal({
 
   // Populate form when initialData changes
   useEffect(() => {
+    if (isOpen) {
+      trackEventSafe('appointment_modal_open', {
+        mode: mode,
+      });
+    }
     if (initialData && mode === 'edit') {
       setFormData({
         startDate: initialData.startDate,
@@ -65,6 +71,9 @@ export function AppointmentModal({
 
     try {
       onSubmit(formData);
+      trackEventSafe('appointment_saved', {
+        mode: mode,
+      });
       // Reset form only in create mode
       if (mode === 'create') {
         setFormData({

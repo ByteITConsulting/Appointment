@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Folga } from '@/lib/types';
 import { colors } from '@/styles/design-tokens';
+import { trackEventSafe } from '@/lib/analytics-tracking';
 import { X, Sunrise } from 'lucide-react';
 import { calcTotalHours, applyLunchDeduction } from '@/lib/calculations';
 
@@ -43,6 +44,11 @@ export function FolgaModal({
 
   // Populate form when initialData changes
   useEffect(() => {
+    if (isOpen) {
+      trackEventSafe('folga_modal_open', {
+        mode: mode,
+      });
+    }
     if (initialData && mode === 'edit') {
       setFormData({
         startDate: initialData.startDate,
@@ -99,6 +105,11 @@ export function FolgaModal({
         ...formData,
         hasLunchBreak,
         lunchDuration,
+      });
+      trackEventSafe('folga_saved', {
+        mode: mode,
+        hours: calculatedHours,
+        hasLunchBreak: hasLunchBreak,
       });
       // Reset form only in create mode
       if (mode === 'create') {
